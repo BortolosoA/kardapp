@@ -22,7 +22,7 @@ public class Menu {
     @GeneratedValue
     @Column(nullable = false)
     private UUID id;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String name;
     @Column(nullable = false)
     private boolean isActive;

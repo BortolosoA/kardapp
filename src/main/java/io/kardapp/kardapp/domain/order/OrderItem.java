@@ -33,6 +33,7 @@ public class OrderItem {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal unitPrice;
 
+    @Column(length = 300)
     private String notes;
 
     @ManyToOne(optional = false)

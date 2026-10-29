@@ -22,10 +22,10 @@ public class StaffUser {
     @Column(nullable = false)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 150)
     private String email;
 
     @ManyToOne(optional = false)

@@ -1,5 +1,4 @@
 package io.kardapp.kardapp;
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

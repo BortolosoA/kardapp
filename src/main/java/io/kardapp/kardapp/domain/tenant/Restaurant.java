@@ -21,15 +21,15 @@ public class Restaurant {
     @GeneratedValue
     @Column(nullable = false)
     private UUID id;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String name;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 50)
     private String slug;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 150)
     private String address;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 16)
     private String phone;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 3)
     private String currency;
 
     @Column(nullable = false)

@@ -21,7 +21,7 @@ public class Modifier {
     @GeneratedValue
     @Column(nullable = false)
     private UUID id;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String name;
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal priceDelta;

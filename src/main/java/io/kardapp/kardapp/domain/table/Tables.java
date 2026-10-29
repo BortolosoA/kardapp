@@ -23,10 +23,10 @@ public class Tables {
     @Column(nullable = false)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String label;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 200)
     private String qrCode;
     @Column(nullable = false)
     private int seats;

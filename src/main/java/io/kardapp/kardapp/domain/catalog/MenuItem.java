@@ -20,14 +20,16 @@ public class MenuItem {
     @GeneratedValue
     @Column(nullable = false)
     private UUID id;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String name;
 
+    @Column(length = 250)
     private String description;
 
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal price;
 
+    @Column(length = 300)
     private String imageUrl;
 
     @Column(nullable = false)

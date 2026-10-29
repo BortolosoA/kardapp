@@ -19,6 +19,6 @@ public class Allergen {
     @GeneratedValue
     @Column(nullable = false)
     private UUID id;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 100)
     private String name;
 }
