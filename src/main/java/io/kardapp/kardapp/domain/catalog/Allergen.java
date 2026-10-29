@@ -1,35 +1,25 @@
-package io.kardapp.kardapp.domain.organization;
-
+package io.kardapp.kardapp.domain.catalog;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "organization")
+@Table(name = "allergens")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Organization {
+public class Allergen {
 
     @Id
     @GeneratedValue
     private UUID id;
-    private String cnpjName;
-    private String fantasyName;
-    private String cnpj;
-    private Long ie;
-
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private String name;
 }

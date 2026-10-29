@@ -1,6 +1,7 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
 CREATE TABLE organization (
-    id UUID gen_random_uuid() PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     cnpj_name VARCHAR(100) NOT NULL,
     fantasy_name VARCHAR(100) NOT NULL,
     cnpj VARCHAR(14) NOT NULL,
