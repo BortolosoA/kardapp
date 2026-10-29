@@ -19,18 +19,27 @@ public class Restaurant {
 
     @Id
     @GeneratedValue
+    @Column(nullable = false)
     private UUID id;
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false, unique = true)
     private String slug;
+    @Column(nullable = false)
     private String address;
+    @Column(nullable = false)
     private String phone;
+    @Column(nullable = false)
     private String currency;
 
+    @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "tenant_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "tenant_id",nullable = false)
     private Tenant tenant;
 
     @PrePersist

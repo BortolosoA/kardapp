@@ -19,12 +19,16 @@ public class ModifierGroup {
 
     @Id
     @GeneratedValue
+    @Column(nullable = false)
     private UUID id;
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
     private int minSelect;
+    @Column(nullable = false)
     private int maxSelect;
 
-    @ManyToOne
-    @JoinColumn(name = "menu_item_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "menu_item_id", nullable = false)
     private MenuItem menuItem;
 }

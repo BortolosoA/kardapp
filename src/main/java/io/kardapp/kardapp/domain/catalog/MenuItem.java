@@ -18,16 +18,25 @@ public class MenuItem {
 
     @Id
     @GeneratedValue
+    @Column(nullable = false)
     private UUID id;
+    @Column(nullable = false)
     private String name;
+
     private String description;
+
+    @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal price;
+
     private String imageUrl;
+
+    @Column(nullable = false)
     private boolean isAvailable;
+    @Column(nullable = false)
     private int sortOrder;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
 }

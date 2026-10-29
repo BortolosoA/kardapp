@@ -23,23 +23,29 @@ public class Order {
 
     @Id
     @GeneratedValue
+    @Column(nullable = false)
     private UUID id;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private OrderStatus status;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private OrderType type;
 
+    @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal total;
+
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
     @ManyToOne
     @JoinColumn(name = "table_id")
     private Tables table;
 
-    @ManyToOne
-    @JoinColumn(name = "restaurant_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
     @ManyToOne

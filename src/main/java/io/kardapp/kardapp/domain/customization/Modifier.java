@@ -19,11 +19,14 @@ public class Modifier {
 
     @Id
     @GeneratedValue
+    @Column(nullable = false)
     private UUID id;
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal priceDelta;
 
-    @ManyToOne
-    @JoinColumn(name = "modifier_group_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "modifier_group_id", nullable = false)
     private ModifierGroup modifierGroup;
 }

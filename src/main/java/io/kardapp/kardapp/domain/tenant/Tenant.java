@@ -19,11 +19,17 @@ public class Tenant {
 
     @Id
     @GeneratedValue
+    @Column(nullable = false)
     private UUID id;
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false, unique = true)
     private String slug;
 
+    @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
     @PrePersist

@@ -20,15 +20,17 @@ public class OrderItemModifier {
 
     @Id
     @GeneratedValue
+    @Column(nullable = false)
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "order_item_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "order_item_id", nullable = false)
     private OrderItem orderItem;
 
+    @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal priceDelta;
 
-    @ManyToOne
-    @JoinColumn(name = "modifier_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "modifier_id", nullable = false)
     private Modifier modifier;
 }

@@ -18,13 +18,14 @@ public class MenuItemAllergen {
 
     @Id
     @GeneratedValue
+    @Column(nullable = false)
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "menu_item_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "menu_item_id", nullable = false)
     private MenuItem menuItem;
 
-    @ManyToOne
-    @JoinColumn(name = "allergen_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "allergen_id", nullable = false)
     private Allergen allergen;
 }

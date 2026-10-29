@@ -18,12 +18,15 @@ public class Category {
 
     @Id
     @GeneratedValue
+    @Column(nullable = false)
     private UUID id;
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
     private int sortOrder;
 
-    @ManyToOne
-    @JoinColumn(name = "menu_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "menu_id", nullable = false)
     private Menu menu;
 
 }

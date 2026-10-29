@@ -10,7 +10,7 @@ import lombok.Setter;
 import java.util.UUID;
 
 @Entity
-@Table(name = "costumers")
+@Table(name = "customers")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -19,12 +19,16 @@ public class Customer {
 
     @Id
     @GeneratedValue
+    @Column(nullable = false)
     private UUID id;
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
     private String phone;
+
     private String email;
 
-    @ManyToOne
-    @JoinColumn(name = "tenant_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "tenant_id", nullable = false)
     private Tenant tenant;
 }

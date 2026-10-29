@@ -19,14 +19,22 @@ public class Tables {
 
     @Id
     @GeneratedValue
+
+    @Column(nullable = false)
     private UUID id;
+
+    @Column(nullable = false)
     private String label;
+
+    @Column(nullable = false, unique = true)
     private String qrCode;
+    @Column(nullable = false)
     private int seats;
+    @Column(nullable = false)
     private boolean inUse;
 
 
-    @ManyToOne
-    @JoinColumn(name = "restaurant_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "restaurant_id",nullable = false)
     private Restaurant restaurant;
 }

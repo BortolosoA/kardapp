@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.UUID;
 
 @Entity
@@ -20,14 +20,17 @@ public class Menu {
 
     @Id
     @GeneratedValue
+    @Column(nullable = false)
     private UUID id;
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
     private boolean isActive;
 
-    private LocalDateTime availableFrom;
-    private LocalDateTime availableTo;
+    private LocalTime availableFrom;
+    private LocalTime availableTo;
 
-    @ManyToOne
-    @JoinColumn(name = "restaurant_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "restaurant_id", nullable = false )
     private Restaurant restaurant;
 }

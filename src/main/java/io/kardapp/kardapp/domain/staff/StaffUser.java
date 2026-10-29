@@ -19,14 +19,20 @@ public class StaffUser {
 
     @Id
     @GeneratedValue
+    @Column(nullable = false)
     private UUID id;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @ManyToOne
-    @JoinColumn(name = "restaurant_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private StaffUserRole role;
 }
