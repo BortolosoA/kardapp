@@ -7,8 +7,8 @@ CREATE TABLE orders (
     total DECIMAL(12,2) NOT NULL,
     created_at TIMESTAMP NOT NULL,
     customer_id UUID,
-    FOREIGN KEY (table_id) REFERENCES tables(id) ON DELETE SET NULL,
-    FOREIGN KEY (restaurant_id) REFERENCES restaurants(id) ON DELETE CASCADE,
+    FOREIGN KEY (table_id) REFERENCES tables(id),
+    FOREIGN KEY (restaurant_id) REFERENCES restaurants(id),
     FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL
 );
 
@@ -19,8 +19,8 @@ CREATE TABLE order_items (
     unit_price DECIMAL(12,2) NOT NULL,
     notes VARCHAR(300),
     menu_item_id UUID NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
-    FOREIGN KEY (menu_item_id) REFERENCES menu_items(id) ON DELETE RESTRICT
+    FOREIGN KEY (order_id) REFERENCES orders(id),
+    FOREIGN KEY (menu_item_id) REFERENCES menu_items(id)
 
 );
 
@@ -29,8 +29,8 @@ CREATE TABLE order_item_modifiers (
     order_item_id UUID NOT NULL,
     price_delta DECIMAL(12,2) NOT NULL,
     modifier_id UUID NOT NULL,
-    FOREIGN KEY (order_item_id) REFERENCES order_items(id) ON DELETE CASCADE,
-    FOREIGN KEY (modifier_id) REFERENCES modifiers(id) ON DELETE RESTRICT
+    FOREIGN KEY (order_item_id) REFERENCES order_items(id),
+    FOREIGN KEY (modifier_id) REFERENCES modifiers(id)
 );
 
 CREATE TABLE payments (
@@ -40,5 +40,5 @@ CREATE TABLE payments (
     method VARCHAR(6) NOT NULL,
     status VARCHAR(9) NOT NULL,
     paid_at TIMESTAMP,
-    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+    FOREIGN KEY (order_id) REFERENCES orders(id)
 );

@@ -18,7 +18,7 @@ CREATE TABLE categories (
     name VARCHAR(100) NOT NULL,
     menu_id UUID NOT NULL,
     sort_order INTEGER NOT NULL,
-    FOREIGN KEY (menu_id) REFERENCES menus(id) ON DELETE CASCADE
+    FOREIGN KEY (menu_id) REFERENCES menus(id)
 );
 
 CREATE TABLE menu_items (
@@ -29,14 +29,16 @@ CREATE TABLE menu_items (
     price DECIMAL(12,2) NOT NULL,
     image_url VARCHAR(300),
     is_available BOOLEAN NOT NULL,
+    archived BOOLEAN NOT NULL DEFAULT FALSE,
     sort_order INTEGER NOT NULL,
-    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+    CONSTRAINT menu_items_archived_unavailable CHECK (NOT archived OR NOT is_available),
+    FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 
 CREATE TABLE menu_item_allergens (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     menu_item_id UUID NOT NULL,
     allergen_id UUID NOT NULL,
-    FOREIGN KEY (menu_item_id) REFERENCES menu_items(id) ON DELETE CASCADE,
-    FOREIGN KEY (allergen_id) REFERENCES allergens(id) ON DELETE CASCADE
+    FOREIGN KEY (menu_item_id) REFERENCES menu_items(id),
+    FOREIGN KEY (allergen_id) REFERENCES allergens(id)
 );

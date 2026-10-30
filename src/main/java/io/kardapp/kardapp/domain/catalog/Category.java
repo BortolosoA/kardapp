@@ -28,5 +28,4 @@ public class Category {
     @ManyToOne(optional = false)
     @JoinColumn(name = "menu_id", nullable = false)
     private Menu menu;
-
 }
