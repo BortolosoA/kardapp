@@ -6,11 +6,13 @@ Este documento descreve o que falta implementar e validar no estado atual do pro
 
 - Aplicação Java 21 com Spring Boot, JPA, PostgreSQL e Flyway.
 - Entidades e repositórios de organizações, restaurantes, catálogo, clientes, funcionários, mesas, pedidos e pagamentos.
-- `MenuItemService` com listagem de produtos não arquivados e arquivamento limitado por tenant e restaurante.
-- Arquivamento mantém o produto no banco e o marca como indisponível.
+- Não existe `MenuItemService` no código atual. `MenuItemRepository` estende `Repository<MenuItem, UUID>`, mas não declara métodos de consulta ou persistência.
+- A entidade `MenuItem` possui `archive()`, que marca o produto como arquivado e indisponível. Ainda falta um serviço transacional que carregue o produto no escopo correto e persista essa alteração.
 - Trigger que rejeita novos itens de pedido com produto inexistente, arquivado ou indisponível.
-- Dois testes unitários de arquivamento e um teste de inicialização do contexto.
+- Existem dois testes unitários de arquivamento, mas eles referenciam o serviço removido e métodos ausentes do repositório; o código de teste precisa ser corrigido para compilar. Existe também um teste de inicialização do contexto.
 - Ainda não existem controllers, DTOs, autenticação nem serviço de criação de pedidos.
+- O `pom.xml` inclui Web MVC e JPA, mas não Bean Validation, Spring Security, Testcontainers nem integração com S3.
+- A configuração lê `DB_URL`, `DB_USERNAME` e `DB_PASSWORD`, importa opcionalmente `.env` e usa `ddl-auto=validate`. A execução das migrations e dos testes não foi validada nesta revisão; as observações abaixo se baseiam na leitura dos arquivos.
 
 ## Organização das migrations
 
@@ -25,11 +27,17 @@ Quando houver um banco que precise ser preservado, mantenha migrations já aplic
 ### O que fazer
 
 - [ ] Criar DTOs separados para cadastrar, editar e consultar produtos.
-- [ ] Adicionar ao `MenuItemService` operações de cadastro e edição.
+- [ ] Declarar em `MenuItemRepository` os métodos necessários para salvar, listar produtos não arquivados e buscar por ID dentro do restaurante e tenant. Manter a exclusão física fora dessa interface.
+- [ ] Criar `MenuItemService` com operações de cadastro, edição, listagem e arquivamento, usando transações nas alterações.
+- [ ] Criar uma busca de categoria limitada por restaurante e tenant em `CategoryRepository`, seguindo o vínculo `Category -> Menu -> Restaurant -> Tenant`.
 - [ ] Criar `MenuItemController` para receber as requisições HTTP.
 - [ ] Fazer a operação de remoção chamar `archive(...)`, sem executar exclusão física.
 - [ ] Validar se a categoria pertence ao restaurante e ao tenant autorizados.
 - [ ] Retornar DTOs em vez de entidades JPA diretamente.
+- [ ] Impedir que a edição reative produtos arquivados ou mova produtos para uma categoria fora do escopo permitido.
+- [ ] Atualizar `MenuItemServiceTests` para o contrato implementado e recuperar a compilação dos testes antes de validar o fluxo HTTP.
+
+Para estudar esse fluxo antes da autenticação, use um escopo fixo de desenvolvimento controlado pelo servidor. Isso não implementa autorização: conectar o escopo à identidade autenticada continua sendo requisito do item 3 antes de disponibilizar operações administrativas.
 
 ### Como pensar nas responsabilidades
 
@@ -45,7 +53,8 @@ Um DTO é uma classe ou `record` com os campos que a API aceita ou devolve. O cl
 ### Critérios de conclusão
 
 - Cadastrar um produto válido retorna seu ID.
-- Consultar o cardápio retorna os campos públicos necessários.
+- Listar produtos retorna DTOs e exclui os arquivados; as regras completas de cardápio público ficam no item 4.
+- Editar um produto válido persiste os campos permitidos e valida a categoria de destino.
 - Arquivar o produto o remove da listagem sem apagar seu registro.
 - Tentar alterar um produto fora do escopo autorizado não o modifica.
 
@@ -88,7 +97,7 @@ Para não revelar a existência de recursos de outras empresas, uma busca limita
 - [ ] Limitar consultas e alterações ao tenant e restaurante corretos.
 - [ ] Definir a autorização de pedidos públicos por QR code; eles não devem depender de permissões administrativas.
 
-Receber `tenantId` em um método não comprova autorização. O controller não deve confiar em um tenant arbitrário enviado pelo cliente. O filtro atual do serviço de produtos precisa ser conectado a um contexto autenticado confiável.
+Receber `tenantId` em um método não comprova autorização. O controller não deve confiar em um tenant arbitrário enviado pelo cliente. Os filtros de escopo a implementar no serviço de produtos precisam ser conectados a um contexto autenticado confiável. `StaffUser` possui nome, e-mail, restaurante e papel, mas ainda não possui credencial local nem vínculo com uma identidade externa.
 
 ### Integridade dos vínculos
 
@@ -104,6 +113,7 @@ As FKs atuais garantem a existência dos registros, mas não essas combinações
 ## 4. Completar menus, categorias e adicionais
 
 - [ ] Criar serviços, DTOs e controllers para menus, categorias e adicionais.
+- [ ] Implementar a associação de alérgenos aos produtos e sua consulta, preservando o catálogo global de alérgenos.
 - [ ] Aplicar `isActive` e horários de disponibilidade do menu na consulta pública e na compra.
 - [ ] Definir como tratar menus cujo horário atravessa meia-noite e qual fuso usar por restaurante.
 - [ ] Decidir se produtos temporariamente indisponíveis ficam visíveis com aviso ou são ocultados.
@@ -111,7 +121,7 @@ As FKs atuais garantem a existência dos registros, mas não essas combinações
 - [ ] Definir como retirar adicionais do catálogo preservando seus usos em pedidos anteriores.
 - [ ] Validar mínimo e máximo de escolhas de cada grupo de adicionais.
 
-A consulta atual de produtos filtra `archived`, mas não verifica menu ativo nem seu horário. Não trate essa listagem isolada como um cardápio público completo.
+Ainda não existe consulta de produtos implementada. Ao criá-la, filtrar apenas `archived` não será suficiente para um cardápio público completo: também será necessário considerar menu ativo, horários e a política de produtos indisponíveis.
 
 ## 5. Implementar criação e alteração de pedidos
 
@@ -119,6 +129,8 @@ A consulta atual de produtos filtra `archived`, mas não verifica menu ativo nem
 
 - [ ] Criar um DTO com IDs dos produtos, quantidades, adicionais e observações.
 - [ ] Criar um `OrderService` com uma operação `@Transactional`.
+- [ ] Criar controllers e DTOs de resposta para criar e consultar pedidos dentro do escopo autorizado.
+- [ ] Definir os dados obrigatórios por `OrderType`: uso de mesa em `DINE_IN` e como representar endereço de entrega em `DELIVERY`, que ainda não possui campo próprio.
 - [ ] Validar restaurante, mesa, cliente e todos os vínculos de tenant.
 - [ ] Validar produto, menu e adicionais disponíveis.
 - [ ] Rejeitar quantidade zero ou negativa.
@@ -149,6 +161,7 @@ A V6 verifica inserções e mudanças de `menu_item_id`. Ela não verifica alter
 - [ ] Substituir setters irrestritos dos campos críticos por operações como iniciar preparo e cancelar.
 - [ ] Definir se pagamento e preparo são estados independentes; o enum atual mistura `PAID` com estados de atendimento.
 - [ ] Criar serviço de registro e confirmação de pagamentos.
+- [ ] Definir os endpoints e DTOs para status e pagamentos, com as permissões correspondentes.
 - [ ] Definir se haverá pagamento parcial, estorno e cancelamento após pagamento.
 - [ ] Atualizar `paidAt` ao confirmar o pagamento, conforme a regra definida.
 - [ ] Evitar processar duas vezes a mesma confirmação de pagamento.
@@ -192,11 +205,13 @@ Primeiro implemente e observe as consultas reais. Trocar tudo para `LAZY` sem co
 
 ## 10. Testar os fluxos com PostgreSQL
 
-Os testes unitários atuais usam Mockito. Eles verificam objetos Java e chamadas ao repositório, mas não executam as queries derivadas, migrations ou trigger.
+Os dois testes de arquivamento foram escritos com Mockito para verificar objetos Java e chamadas ao repositório, mas atualmente referenciam código ausente e não compilam como estão. Mesmo após corrigidos, não executarão queries derivadas, migrations ou trigger.
 
+- [ ] Corrigir as referências ao serviço e aos métodos do repositório e executar a compilação dos testes.
+- [ ] Adicionar testes HTTP de cadastro, edição, listagem e arquivamento, incluindo entradas inválidas e recursos fora do escopo.
 - [ ] Configurar um PostgreSQL exclusivo de testes, por exemplo com Testcontainers, se Docker estiver disponível.
 - [ ] Executar V1 até V6 em um banco vazio e iniciar o contexto Spring.
-- [ ] Validar os métodos derivados de `MenuItemRepository` com dados reais.
+- [ ] Validar os métodos de consulta que forem adicionados a `MenuItemRepository` e `CategoryRepository` com dados reais.
 - [ ] Persistir um pedido, arquivar seu produto e consultar o pedido novamente.
 - [ ] Confirmar que produto arquivado ou indisponível não entra em novo item de pedido.
 - [ ] Testar alteração de quantidade e tentativa de transferência de item, conforme as regras escolhidas.
@@ -214,6 +229,7 @@ Deixar para depois do fluxo principal de catálogo e pedidos.
 - [ ] Marcar a conta como em encerramento e bloquear novas operações.
 - [ ] Gerar PDF para consulta e JSON ou CSV para recuperação estruturada.
 - [ ] Enviar ao S3 e confirmar integridade e conclusão do envio.
+- [ ] Adicionar e configurar a integração com S3 e a geração dos arquivos; essas dependências e serviços ainda não existem.
 - [ ] Registrar o andamento fora dos dados que serão excluídos, para permitir retomada em caso de falha.
 - [ ] Excluir somente os dados do tenant, em ordem compatível com as FKs e dentro de uma transação quando viável.
 - [ ] Preservar dados globais compartilhados, como o catálogo de alérgenos.
@@ -226,13 +242,14 @@ Com as FKs atuais, excluir apenas o tenant não remove automaticamente todos os 
 
 - [ ] Criar um README com Java necessário, banco, variáveis de ambiente e comandos de execução.
 - [ ] Documentar como executar testes e reconstruir o banco de desenvolvimento.
-- [ ] Manter credenciais fora do Git e disponibilizar somente exemplos sem valores reais.
+- [ ] Manter a configuração por variáveis de ambiente e revisar `.env.example` para documentar as variáveis necessárias sem valores reais.
+- [ ] Documentar ou implementar a preparação de tenant, restaurante, menu e categoria para experimentar o primeiro cadastro de produto; ainda não existem fluxos HTTP para esses cadastros.
 - [ ] Documentar os endpoints à medida que forem criados.
 - [ ] Automatizar compilação e testes em integração contínua quando o primeiro fluxo estiver funcionando.
 
 ## Ordem sugerida de estudo
 
-1. DTOs, validação e cadastro/consulta de produtos.
+1. Métodos dos repositórios, serviço de produtos e correção dos testes que referenciam código removido; depois DTOs, validação e cadastro/consulta.
 2. Controllers e tratamento de erros.
 3. Autenticação, autorização e tenant confiável.
 4. Menus, categorias e adicionais.
